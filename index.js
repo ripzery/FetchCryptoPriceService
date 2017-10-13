@@ -13,6 +13,7 @@ const firestore = new Firestore({
     keyFilename: 'cryptracker-cb2be48ee926.json'
 })
 
+/* Fetch Bx.in.th price */
 const fetchBx = async () => {
     let response = await fetch(ENDPOINT_BX)
     let bx = await response.json()
@@ -22,6 +23,7 @@ const fetchBx = async () => {
     }
 }
 
+/* Fetch coinmarketcap.com price */
 const fetchCoinmarketCap = async () => {
     let response = await fetch(ENDPOINT_COIN_MARKET_CAP)
     let cmc = await response.json()
@@ -32,11 +34,15 @@ const fetchCoinmarketCap = async () => {
     }
 }
 
+/* Fetch all users whice their last seen price changes more than 5% from the current price 
+*  Return deviceId list
+*/
 const fetchFirestore = async (basePrice) => {
     let querySnapshot = await firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg * 1.05).get()
     let documentsSnapshot = await querySnapshot.docs
-    let datas = await documentsSnapshot.map(document => document.data());
-    console.log(`Data size : '${datas[0].deviceId}'`)
+    let datas = await documentsSnapshot.map(document => document.data().deviceId);
+    console.log(datas)
+    return datas
 }
 
 const fetchAll = async () => {
