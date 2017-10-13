@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "cryptracker",
+  "private_key_id": "cb2be48ee92620b352b00b8dce01044de939bc7a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCOcN+t8GVeqie/\nrKdaAXJ56hnzsL6jL8W5ctxwMyNinwr5O4PjABPTNtc6P8MQMzHzLnTBcXhGkhLG\ncA/6FCaKtg6TeoI9+Q5LLCSi79yPOMu7IwBSy3FUNGKDnmljUn7LG+u9BZEXtAnS\ndUeHuj01xuQChiMIiMnKlcGS0Fr/EmMvic8DIbFpp6drdD7G0N9sLC8G2tUKbjas\nJNPv1ZK0DtCeay45o2fwGw0ABQd+X/JZVh66C1jym5sTkvIvMXu2p0d8NV7oTz8g\nH02nb7xXUOkVeH/fUzHvd0pdSI3w3HlMdBOdbxTyrXcXPYi9LA6xl+eoqsxdNYK6\nVGZqVsN/AgMBAAECggEACANEJ0jAAGnvVSelPQ7vyE6UVH0Q0aU8/jL+ljaKOwta\nAViJEW/5AtyxkXlHboCIGCH44hjmpzGjFL6hEh79ZrgvFw9r3DNHy+Vueiv8FaJ1\nniVYk0/BJEzTbeFaFFhDrFv5uucL7nAWTVyDlZhdxnSrHD6SIfIanTwnaNbdB5Qv\nvBaE5MJJGJCWH5eX0h7j354yIp1pxB2fxwVK/fHBTDCPJEybBAbaXyUr+auHkDYd\nskRrahFWK6IEjIAB5y5FhjDmz7Hcu0njv9geLZIqy6EjdPam8wBWOJuKffCUrQUh\nKd5UjUnpP+stShXI9cW/umpceis4JgqmWqql4M544QKBgQDAOpKpzXYtBB+Zp8NA\nGpYge/SZBUWIYxG/ruQr/bWeXGQ2/hfTsRHuhLBv7XaV5EqeP/BJ3GqegNBe9rPi\nRpyQmq8wK2IECzOgj5FJVTS183Uz4YNMIKonT35s6r/Oh9tRRROX6hbGYeYGW3yW\nMnIHVFCKGl0fb4b6hEtRlPjqcwKBgQC9sfY+cXHkfO5zyBvhNDwubDsq66v03mZJ\nTLWjLy380WFpPKDNkuaUUOBCO8qhrAVdJWEtk1JiU/fZPcsU9uufV4TAhXXQRnlK\nYFOj0nAk0ZO9TBGhzqJ5wUX1gm5FjG6gXhKLAPIxjTsucmW5WsOlZabOSedMvJoi\nvPTEagkDxQKBgQCRWTigcBzVOPLz6if2hqPReCigs5253L8E4ybgJHx5e37DHinC\nBXd7lJUcbL9n4zCQq+Py1VlA9EGaLIwjoiSsKmog0AzS5e1pkGTYwDaVBbsvOWtf\n2qsOAkuj63SQo6UvtD12dqg15LxbPj3cC9Swug4T/o8/P8MeFX4l97CnBQKBgGFI\nhSqc73XohDmopHOoYDzGkMmAN53K+NYamwRnS8RedQCNcUI8Vjg2Ceyt0Ut8dvvA\nEchXx2ZZ/b/RqvbDcy8yqQg66aK4obd9Eyfu4khfms731gsPd8/NSN2R2I+eZ5Wi\n6QuUnqC+91zomjamz7NhIFynFhIKn1m1Ying32KpAoGASIGnXKnt5rjwWycDTnwv\nNKHe21Om/rAafywuSpbqmUVHB1RZ79ACpwBdL4nk3hRp+KfYMLX21EgpxBfdbTon\nzTLZhEUsAIRfC8hzpnvg//SVnt6kD83FkqWlmE5aSjKYcWlGzE2G382CugFGZkAm\nomP8ZFU4O+28N1pd2hREsO4=\n-----END PRIVATE KEY-----\n",
+  "client_email": "id-polling-crypto-price@cryptracker.iam.gserviceaccount.com",
+  "client_id": "116415601899851420794",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/id-polling-crypto-price%40cryptracker.iam.gserviceaccount.com"
+}

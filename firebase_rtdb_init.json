@@ -1,0 +1,17 @@
+[
+    {
+        "deviceId": "1234566644",
+        "cryptoList": [
+            {
+                "id": "omg",
+                "bx_price": "275.05",
+                "cmc_price": "8.85"
+            },
+            {
+                "id": "evx",
+                "bx_price": "45.05",
+                "cmc_price": "1.13"
+            }
+        ]
+    }
+]
