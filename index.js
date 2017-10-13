@@ -27,7 +27,7 @@ const fetchCoinmarketCap = async () => {
 
 const fetchAll = async () => {
     let response = await Promise.all([fetchBx(), fetchCoinmarketCap()])
-    console.log(response)
+    console.log(response[0], response[1])
 }
 
 setInterval(fetchAll, 5000)
