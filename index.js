@@ -40,14 +40,17 @@ const fetchCoinmarketCap = async () => {
 *  Return deviceId list
 */
 const fetchNeededNotifyUsers = async (basePrice, deviation) => {
-    let bxPriceUpQuerySnapshot = await firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg * (1 + deviation)).get()
-    let bxPriceDownQuerySnapshot = await firestore.collection('users').where('omg.bx_price', "<=", basePrice.omg * (1 - deviation)).get()
+    let [bxPriceUpQuerySnapshot, bxPriceDownQuerySnapshot] = await Promise.all([
+        firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg * (1 + deviation)).get(),
+        firestore.collection('users').where('omg.bx_price', "<=", basePrice.omg * (1 - deviation)).get()
+    ])
 
-    let bxPriceUpDocumentsSnapshot = await bxPriceUpQuerySnapshot.docs
-    let bxPriceDownDocumentsSnapshot = await bxPriceDownQuerySnapshot.docs
+    let [bxPriceUpDocumentsSnapshot, bxPriceDownDocumentsSnapshot] = await Promise.all([bxPriceUpQuerySnapshot.docs, bxPriceDownQuerySnapshot.docs])
 
-    let bxPriceUpDatas = await bxPriceUpDocumentsSnapshot.map(document => document.data().deviceId);
-    let bxPriceDownDatas = await bxPriceDownDocumentsSnapshot.map(document => document.data().deviceId);
+    let [bxPriceUpDatas, bxPriceDownDatas] = await Promise.all([
+        bxPriceUpDocumentsSnapshot.map(document => document.data().deviceId),
+        bxPriceDownDocumentsSnapshot.map(document => document.data().deviceId)
+    ])
 
     return {
         priceUp: bxPriceUpDatas,
