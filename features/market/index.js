@@ -28,7 +28,6 @@ class MarketService {
             evx
         }
     }
-
 }
 
 module.exports = new MarketService()
