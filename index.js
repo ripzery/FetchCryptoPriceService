@@ -49,7 +49,7 @@ const fetchCoinmarketCap = async () => {
 const fetchNeededNotifyUsers = async (basePrice, deviation) => {
     /* Query bx price that have deviation more than or equal 5% */
     let [bxPriceUpQuerySnapshot, bxPriceDownQuerySnapshot] = await Promise.all([
-        firestore.collection('users').where('omg.bx_price', "<=", basePrice.omg / (1 + deviation)).get(),
+        firestore.collection('users')/* .where('omg.bx_price', "<=", basePrice.omg / (1 + deviation)) */.get(),
         firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg / (1 - deviation)).get()
     ])
 
@@ -57,10 +57,11 @@ const fetchNeededNotifyUsers = async (basePrice, deviation) => {
     let [bxPriceUpDocumentsSnapshot, bxPriceDownDocumentsSnapshot] = await Promise.all([bxPriceUpQuerySnapshot.docs, bxPriceDownQuerySnapshot.docs])
 
     /* Get deviceTokens of the users that needed notify */
-    let predicate = (document) => document.data().refreshedToken
+    let filteredPredicate = (document) => document.data().refreshedToken
+    let mappedPredicate = (document) => { return { ...document.data(), id: document.id } }
     let [bxPriceUpDatas, bxPriceDownDatas] = await Promise.all([
-        bxPriceUpDocumentsSnapshot.filter(predicate).map(predicate),
-        bxPriceDownDocumentsSnapshot.filter(predicate).map(predicate)
+        bxPriceUpDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
+        bxPriceDownDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate)
     ])
 
     return {
@@ -70,8 +71,13 @@ const fetchNeededNotifyUsers = async (basePrice, deviation) => {
 }
 
 const notifyUsers = async (waitingNotifyUsers, price) => {
+    let waitingNotifyUserTokens = {
+        priceUp: waitingNotifyUsers.priceUp.map(v => v.refreshedToken),
+        priceDown: waitingNotifyUsers.priceDown.map(v => v.refreshedToken)
+    }
+
     /* If there're no users should be notified then do nothing. */
-    if (waitingNotifyUsers.priceUp.length + waitingNotifyUsers.priceDown.length == 0) return
+    if (waitingNotifyUserTokens.priceUp.length + waitingNotifyUserTokens.priceDown.length == 0) return
 
     /* Build payload based on price is going up or down */
     let payload = {
@@ -82,25 +88,29 @@ const notifyUsers = async (waitingNotifyUsers, price) => {
         }
     }
 
-    if (waitingNotifyUsers.priceUp.length) {
+    if (waitingNotifyUserTokens.priceUp.length) {
         payload.data.type = "up"
         payload.data.body = `Hooray! OMG is going up more than 5%!. The current price is now ${price.omg}`
         payload.data.color = COLOR_GREEN
-        let response = await admin.messaging().sendToDevice(waitingNotifyUsers.priceUp, payload)
+        let response = await admin.messaging().sendToDevice(waitingNotifyUserTokens.priceUp, payload)
         logFCMResponse(response)
+        updateDocument(!response.failureCount)
     }
 
-    if (waitingNotifyUsers.priceDown.length) {
+    if (waitingNotifyUserTokens.priceDown.length) {
         payload.data.type = "down"
         payload.data.body = `Boo.. OMG is going down 5% check it out. The current price is now ${price.omg}`
         payload.data.color = COLOR_RED
-        let response = await admin.messaging().sendToDevice(waitingNotifyUsers.priceDown, payload)
+        let response = await admin.messaging().sendToDevice(waitingNotifyUserTokens.priceDown, payload)
         logFCMResponse(response)
+        updateDocument(!response.failureCount)
     }
 }
 
-const updateDocument = () => {
-    
+const updateDocument = (pushNotificationSuccess, users) => {
+    if (!pushNotificationSuccess) return
+
+
 }
 
 const logFCMResponse = (response) => {
