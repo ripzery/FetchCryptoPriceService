@@ -59,11 +59,11 @@ const fetchNeededNotifyUsers = async (basePrice, deviation) => {
 }
 
 /* Combine all together */
-const fetchAll = async () => {
-    let response = await Promise.all([fetchBx(), fetchCoinmarketCap()])
-    let bxPrice = await response[0]
+const process = async () => {
+    let [bxPrice, cmcPrice] = await Promise.all([fetchBx(), fetchCoinmarketCap()])
     let waitingNotifyUsers = await fetchNeededNotifyUsers(bxPrice, PRICE_DEVIATION)
     console.log(waitingNotifyUsers)
 }
 
-setInterval(fetchAll, 3000)
+
+setInterval(process, 3000)
