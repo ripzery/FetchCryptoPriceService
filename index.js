@@ -59,6 +59,7 @@ const fetchNeededNotifyUsers = async (basePrice, deviation) => {
     /* Get deviceTokens of the users that needed notify */
     let filteredPredicate = (document) => document.data().refreshedToken
     let mappedPredicate = (document) => { return { ...document.data(), id: document.id } }
+
     let [bxPriceUpDatas, bxPriceDownDatas] = await Promise.all([
         bxPriceUpDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
         bxPriceDownDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate)
@@ -94,7 +95,7 @@ const notifyUsers = async (waitingNotifyUsers, price) => {
         payload.data.color = COLOR_GREEN
         let response = await admin.messaging().sendToDevice(waitingNotifyUserTokens.priceUp, payload)
         logFCMResponse(response)
-        updateDocument(!response.failureCount)
+        updateDocument(!response.failureCount, [...waitingNotifyUsers.priceUp, ...waitingNotifyUsers.priceDown], price)
     }
 
     if (waitingNotifyUserTokens.priceDown.length) {
@@ -103,14 +104,23 @@ const notifyUsers = async (waitingNotifyUsers, price) => {
         payload.data.color = COLOR_RED
         let response = await admin.messaging().sendToDevice(waitingNotifyUserTokens.priceDown, payload)
         logFCMResponse(response)
-        updateDocument(!response.failureCount)
+        updateDocument(!response.failureCount, [...waitingNotifyUsers.priceUp, ...waitingNotifyUsers.priceDown], price)
     }
+    return
 }
 
-const updateDocument = (pushNotificationSuccess, users) => {
+const updateDocument = async (pushNotificationSuccess, users, currentPrice) => {
     if (!pushNotificationSuccess) return
+    console.log(users)
+    let firestoreBatch = firestore.batch()
 
+    for (let user of users) {
+        let doc = firestore.collection('users').doc(user.id)
+        firestoreBatch.update(doc, { omg: { bx_price: currentPrice.omg } })
+    }
 
+    let response = await firestoreBatch.commit()
+    return console.log(`Successfully executed ${users.length} batch.`)
 }
 
 const logFCMResponse = (response) => {
@@ -125,10 +135,8 @@ const logFCMResponse = (response) => {
 const process = async () => {
     let [bxPrice, cmcPrice] = await Promise.all([fetchBx(), fetchCoinmarketCap()])
     let waitingNotifyUsers = await fetchNeededNotifyUsers(bxPrice, PRICE_DEVIATION)
-    console.log(waitingNotifyUsers)
-
     notifyUsers(waitingNotifyUsers, bxPrice)
 }
 
-// process()
-setInterval(process, 3000)
+process()
+// setInterval(process, 3000)
