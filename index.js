@@ -13,6 +13,8 @@ const firestore = new Firestore({
     keyFilename: 'cryptracker-cb2be48ee926.json'
 })
 
+const PRICE_DEVIATION = 5 / 100; // Notify when price change (up/down) over x %
+
 /* Fetch Bx.in.th price */
 const fetchBx = async () => {
     let response = await fetch(ENDPOINT_BX)
@@ -37,19 +39,28 @@ const fetchCoinmarketCap = async () => {
 /* Fetch all users whice their last seen price changes more than 5% from the current price.
 *  Return deviceId list
 */
-const fetchNeededNotifyUsersByBxPrice = async (basePrice) => {
-    let querySnapshot = await firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg * 1.05).get()
-    let documentsSnapshot = await querySnapshot.docs
-    let datas = await documentsSnapshot.map(document => document.data().deviceId);
-    console.log(datas)
-    return datas
+const fetchNeededNotifyUsers = async (basePrice, deviation) => {
+    let bxPriceUpQuerySnapshot = await firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg * (1 + deviation)).get()
+    let bxPriceDownQuerySnapshot = await firestore.collection('users').where('omg.bx_price', "<=", basePrice.omg * (1 - deviation)).get()
+
+    let bxPriceUpDocumentsSnapshot = await bxPriceUpQuerySnapshot.docs
+    let bxPriceDownDocumentsSnapshot = await bxPriceDownQuerySnapshot.docs
+
+    let bxPriceUpDatas = await bxPriceUpDocumentsSnapshot.map(document => document.data().deviceId);
+    let bxPriceDownDatas = await bxPriceDownDocumentsSnapshot.map(document => document.data().deviceId);
+
+    return {
+        priceUp: bxPriceUpDatas,
+        priceDown: bxPriceDownDatas
+    }
 }
 
 /* Combine all together */
 const fetchAll = async () => {
     let response = await Promise.all([fetchBx(), fetchCoinmarketCap()])
     let bxPrice = await response[0]
-    let userLastSeenPriceResponse = await fetchNeededNotifyUsersByBxPrice(bxPrice)
+    let waitingNotifyUsers = await fetchNeededNotifyUsers(bxPrice, PRICE_DEVIATION)
+    console.log(waitingNotifyUsers)
 }
 
 setInterval(fetchAll, 3000)
