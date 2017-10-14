@@ -1,5 +1,7 @@
 const fetch = require('isomorphic-unfetch')
 const Firestore = require('@google-cloud/firestore')
+const admin = require('firebase-admin')
+const serviceAccount = require('./cryptracker-cb2be48ee926.json')
 
 const ENDPOINT_BX = 'https://bx.in.th/api/'
 const ENDPOINT_COIN_MARKET_CAP = 'https://api.coinmarketcap.com/v1/ticker/'
@@ -8,12 +10,20 @@ const BX_KEY_EVX = '28'
 const CMC_KEY_OMG = 'omisego'
 const CMC_KEY_EVX = 'everex'
 
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://cryptracker.firebaseio.com"
+});
+
 const firestore = new Firestore({
     projectId: 'cryptracker',
     keyFilename: 'cryptracker-cb2be48ee926.json'
 })
 
-const PRICE_DEVIATION = 1 / 100; // Notify when price change (up/down) over x %
+
+
+const PRICE_DEVIATION = 5 / 100; // Notify when price change (up/down) over x %
 
 /* Fetch Bx.in.th price */
 const fetchBx = async () => {
@@ -58,11 +68,35 @@ const fetchNeededNotifyUsers = async (basePrice, deviation) => {
     }
 }
 
+const notifyUsers = async (waitingNotifyUsers, price) => {
+    if (waitingNotifyUsers.priceUp.length + waitingNotifyUsers.priceDown.length == 0) return
+    let payload = {
+        data: {
+            currentPrice: `${price.omg}`
+        },
+        notification: {
+            title: waitingNotifyUsers.priceUp.length ? "Hooray! Price is going up 5% check it out!" : "Boo.. Price is going down 5% check it out.",
+            body: `The current price is now ${price.omg}`
+        }
+    }
+
+    let notification = waitingNotifyUsers.priceUp.length ? waitingNotifyUsers.priceUp : waitingNotifyUsers.priceDown
+    let response = await admin.messaging().sendToDevice(notification, payload)
+    if (response.failureCount) {
+        let { code, message } = response.results[0].error.errorInfo
+        console.log("Error sending message \ncode:", code + "\nmessage:", message);
+    } else
+        console.log("Successfully sent message:", response);
+
+}
+
 /* Combine all together */
 const process = async () => {
     let [bxPrice, cmcPrice] = await Promise.all([fetchBx(), fetchCoinmarketCap()])
     let waitingNotifyUsers = await fetchNeededNotifyUsers(bxPrice, PRICE_DEVIATION)
     console.log(waitingNotifyUsers)
+
+    notifyUsers(waitingNotifyUsers, bxPrice)
 }
 
 
