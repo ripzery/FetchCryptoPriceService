@@ -54,9 +54,10 @@ const fetchNeededNotifyUsers = async (basePrice, deviation) => {
     let [bxPriceUpDocumentsSnapshot, bxPriceDownDocumentsSnapshot] = await Promise.all([bxPriceUpQuerySnapshot.docs, bxPriceDownQuerySnapshot.docs])
 
     /* Get deviceTokens of the users that needed notify */
+    let predicate = (document) => document.data().refreshedToken
     let [bxPriceUpDatas, bxPriceDownDatas] = await Promise.all([
-        bxPriceUpDocumentsSnapshot.map(document => document.data().deviceId),
-        bxPriceDownDocumentsSnapshot.map(document => document.data().deviceId)
+        bxPriceUpDocumentsSnapshot.filter(predicate).map(predicate),
+        bxPriceDownDocumentsSnapshot.filter(predicate).map(predicate)
     ])
 
     return {
