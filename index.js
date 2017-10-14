@@ -9,6 +9,9 @@ const BX_KEY_EVX = '28'
 const CMC_KEY_OMG = 'omisego'
 const CMC_KEY_EVX = 'everex'
 
+const COLOR_RED = '#f44336'
+const COLOR_GREEN = '#4caf50'
+
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -73,25 +76,35 @@ const notifyUsers = async (waitingNotifyUsers, price) => {
     /* Build payload based on price is going up or down */
     let payload = {
         data: {
-            currentPrice: `${price.omg}`
-        },
-        notification: {
-            title: waitingNotifyUsers.priceUp.length ? "Hooray! Price is going up 5% check it out!" : "Boo.. Price is going down 5% check it out.",
-            body: `The current price is now ${price.omg}`
+            currentPrice: `${price.omg}`,
+            type: "",
+            title: "Cryptracker"
         }
     }
 
-    let notification = waitingNotifyUsers.priceUp.length ? waitingNotifyUsers.priceUp : waitingNotifyUsers.priceDown
+    if (waitingNotifyUsers.priceUp.length) {
+        payload.data.type = "up"
+        payload.data.body = `Hooray! OMG is going up more than 5%!. The current price is now ${price.omg}`
+        payload.data.color = COLOR_GREEN
+        let response = await admin.messaging().sendToDevice(waitingNotifyUsers.priceUp, payload)
+        logFCMResponse(response)
+    }
 
-    /* Send notification */
-    let response = await admin.messaging().sendToDevice(notification, payload)
+    if (waitingNotifyUsers.priceDown.length) {
+        payload.data.type = "down"
+        payload.data.body = `Boo.. OMG is going down 5% check it out. The current price is now ${price.omg}`
+        payload.data.color = COLOR_RED
+        let response = await admin.messaging().sendToDevice(waitingNotifyUsers.priceDown, payload)
+        logFCMResponse(response)
+    }
+}
 
+const logFCMResponse = (response) => {
     if (response.failureCount) {
         let { code, message } = response.results[0].error.errorInfo
         console.log("Error sending message \ncode:", code + "\nmessage:", message);
     } else
         console.log("Successfully sent message:", response);
-
 }
 
 /* Combine all together */
@@ -103,5 +116,5 @@ const process = async () => {
     notifyUsers(waitingNotifyUsers, bxPrice)
 }
 
-
-setInterval(process, 3000)
+process()
+// setInterval(process, 3000)
