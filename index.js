@@ -99,6 +99,10 @@ const notifyUsers = async (waitingNotifyUsers, price) => {
     }
 }
 
+const updateDocument = () => {
+    
+}
+
 const logFCMResponse = (response) => {
     if (response.failureCount) {
         let { code, message } = response.results[0].error.errorInfo
@@ -116,5 +120,5 @@ const process = async () => {
     notifyUsers(waitingNotifyUsers, bxPrice)
 }
 
-process()
-// setInterval(process, 3000)
+// process()
+setInterval(process, 3000)
