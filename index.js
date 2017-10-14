@@ -1,5 +1,4 @@
 const fetch = require('isomorphic-unfetch')
-const Firestore = require('@google-cloud/firestore')
 const admin = require('firebase-admin')
 const serviceAccount = require('./cryptracker-cb2be48ee926.json')
 
@@ -16,12 +15,7 @@ admin.initializeApp({
     databaseURL: "https://cryptracker.firebaseio.com"
 });
 
-const firestore = new Firestore({
-    projectId: 'cryptracker',
-    keyFilename: 'cryptracker-cb2be48ee926.json'
-})
-
-
+const firestore = admin.firestore()
 
 const PRICE_DEVIATION = 5 / 100; // Notify when price change (up/down) over x %
 

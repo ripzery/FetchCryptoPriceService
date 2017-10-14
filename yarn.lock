@@ -39,7 +39,7 @@
     string-format-obj "^1.1.0"
     through2 "^2.0.3"
 
-"@google-cloud/firestore@^0.8.2", "@google-cloud/firestore@~0.8.2":
+"@google-cloud/firestore@~0.8.2":
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/@google-cloud/firestore/-/firestore-0.8.2.tgz#e93a7068b723f0773c1af62f3494c0633ba2d346"
   dependencies:

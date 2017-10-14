@@ -6,7 +6,6 @@
   "author": "Phuchit Sirimongkolsathien <phuchit.sir@ascendcorp.com>",
   "license": "MIT",
   "dependencies": {
-    "@google-cloud/firestore": "^0.8.2",
     "firebase-admin": "^5.4.2",
     "isomorphic-unfetch": "^2.0.0"
   },
