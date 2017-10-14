@@ -13,7 +13,7 @@ const firestore = new Firestore({
     keyFilename: 'cryptracker-cb2be48ee926.json'
 })
 
-const PRICE_DEVIATION = 5 / 100; // Notify when price change (up/down) over x %
+const PRICE_DEVIATION = 1 / 100; // Notify when price change (up/down) over x %
 
 /* Fetch Bx.in.th price */
 const fetchBx = async () => {
@@ -41,8 +41,8 @@ const fetchCoinmarketCap = async () => {
 */
 const fetchNeededNotifyUsers = async (basePrice, deviation) => {
     let [bxPriceUpQuerySnapshot, bxPriceDownQuerySnapshot] = await Promise.all([
-        firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg * (1 + deviation)).get(),
-        firestore.collection('users').where('omg.bx_price', "<=", basePrice.omg * (1 - deviation)).get()
+        firestore.collection('users').where('omg.bx_price', "<=", basePrice.omg / (1 + deviation)).get(),
+        firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg / (1 - deviation)).get()
     ])
 
     let [bxPriceUpDocumentsSnapshot, bxPriceDownDocumentsSnapshot] = await Promise.all([bxPriceUpQuerySnapshot.docs, bxPriceDownQuerySnapshot.docs])
