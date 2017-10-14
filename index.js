@@ -34,10 +34,10 @@ const fetchCoinmarketCap = async () => {
     }
 }
 
-/* Fetch all users whice their last seen price changes more than 5% from the current price 
+/* Fetch all users whice their last seen price changes more than 5% from the current price.
 *  Return deviceId list
 */
-const fetchFirestore = async (basePrice) => {
+const fetchNeededNotifyUsersByBxPrice = async (basePrice) => {
     let querySnapshot = await firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg * 1.05).get()
     let documentsSnapshot = await querySnapshot.docs
     let datas = await documentsSnapshot.map(document => document.data().deviceId);
@@ -45,11 +45,11 @@ const fetchFirestore = async (basePrice) => {
     return datas
 }
 
+/* Combine all together */
 const fetchAll = async () => {
     let response = await Promise.all([fetchBx(), fetchCoinmarketCap()])
     let bxPrice = await response[0]
-    let firestoreResponse = await fetchFirestore(bxPrice)
-    
+    let userLastSeenPriceResponse = await fetchNeededNotifyUsersByBxPrice(bxPrice)
 }
 
 setInterval(fetchAll, 3000)
