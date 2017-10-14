@@ -30,6 +30,7 @@ class CloudMessagingService {
         /* If there're no users should be notified then do nothing. */
         if (waitingNotifyUserTokens.priceUp.length + waitingNotifyUserTokens.priceDown.length == 0) return
 
+        /* If there's users should be know that price is going up, then send notification */
         if (waitingNotifyUserTokens.priceUp.length) {
             this.payload.data.type = "up"
             this.payload.data.body = `Hooray! OMG is going up more than 5%!. The current price is now ${price.omg}`
@@ -39,6 +40,7 @@ class CloudMessagingService {
             FirestoreService.updateDocument(!response.failureCount, [...waitingNotifyUsers.priceUp, ...waitingNotifyUsers.priceDown], price)
         }
 
+        /* If there's users should be know that price is going down, then send notification */
         if (waitingNotifyUserTokens.priceDown.length) {
             this.payload.data.type = "down"
             this.payload.data.body = `Boo.. OMG is going down 5% check it out. The current price is now ${price.omg}`
