@@ -63,7 +63,10 @@ const fetchNeededNotifyUsers = async (basePrice, deviation) => {
 }
 
 const notifyUsers = async (waitingNotifyUsers, price) => {
+    /* If there're no users should be notified then do nothing. */
     if (waitingNotifyUsers.priceUp.length + waitingNotifyUsers.priceDown.length == 0) return
+
+    /* Build payload based on price is going up or down */
     let payload = {
         data: {
             currentPrice: `${price.omg}`
@@ -75,7 +78,10 @@ const notifyUsers = async (waitingNotifyUsers, price) => {
     }
 
     let notification = waitingNotifyUsers.priceUp.length ? waitingNotifyUsers.priceUp : waitingNotifyUsers.priceDown
+
+    /* Send notification */
     let response = await admin.messaging().sendToDevice(notification, payload)
+
     if (response.failureCount) {
         let { code, message } = response.results[0].error.errorInfo
         console.log("Error sending message \ncode:", code + "\nmessage:", message);
