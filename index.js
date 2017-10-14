@@ -44,13 +44,16 @@ const fetchCoinmarketCap = async () => {
 *  Return deviceId list
 */
 const fetchNeededNotifyUsers = async (basePrice, deviation) => {
+    /* Query bx price that have deviation more than or equal 5% */
     let [bxPriceUpQuerySnapshot, bxPriceDownQuerySnapshot] = await Promise.all([
         firestore.collection('users').where('omg.bx_price', "<=", basePrice.omg / (1 + deviation)).get(),
         firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg / (1 - deviation)).get()
     ])
 
+    /* Get document snapshot for each user */
     let [bxPriceUpDocumentsSnapshot, bxPriceDownDocumentsSnapshot] = await Promise.all([bxPriceUpQuerySnapshot.docs, bxPriceDownQuerySnapshot.docs])
 
+    /* Get deviceTokens of the users that needed notify */
     let [bxPriceUpDatas, bxPriceDownDatas] = await Promise.all([
         bxPriceUpDocumentsSnapshot.map(document => document.data().deviceId),
         bxPriceDownDocumentsSnapshot.map(document => document.data().deviceId)
