@@ -15,26 +15,36 @@ class FirestoreService {
     */
     async fetchNeededNotifyUsers(basePrice, deviation) {
         /* Query bx price that have deviation more than or equal 5% */
-        let [bxPriceUpQuerySnapshot, bxPriceDownQuerySnapshot] = await Promise.all([
-            this.firestore.collection('users')/* .where('omg.bx_price', "<=", basePrice.omg / (1 + deviation)) */.get(),
-            this.firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg / (1 - deviation)).get()
+        let [omgBxPriceUpQuerySnapshot, omgBxPriceDownQuerySnapshot, evxBxPriceUpQuerySnapshot, evxBxPriceDownQuerySnapshot] = await Promise.all([
+            this.firestore.collection('users').where('omg.bx_price', "<=", basePrice.omg / (1 + deviation)).get(),
+            this.firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg / (1 - deviation)).get(),
+            this.firestore.collection('users').where('evx.bx_price', "<=", basePrice.evx / (1 + deviation)).get(),
+            this.firestore.collection('users').where('evx.bx_price', ">=", basePrice.evx / (1 - deviation)).get()
         ])
 
         /* Get document snapshot for each user */
-        let [bxPriceUpDocumentsSnapshot, bxPriceDownDocumentsSnapshot] = await Promise.all([bxPriceUpQuerySnapshot.docs, bxPriceDownQuerySnapshot.docs])
+        let [omgBxPriceUpDocumentsSnapshot, omgBxPriceDownDocumentsSnapshot, evxBxPriceUpDocumentsSnapshot, evxBxPriceDownDocumentsSnapshot] = await Promise.all([omgBxPriceUpQuerySnapshot.docs, omgBxPriceDownQuerySnapshot.docs, evxBxPriceUpQuerySnapshot.docs, evxBxPriceDownQuerySnapshot.docs])
 
         /* Get deviceTokens of the users that needed notify */
         let filteredPredicate = (document) => document.data().refreshedToken
         let mappedPredicate = (document) => { return { ...document.data(), id: document.id } }
 
-        let [bxPriceUpDatas, bxPriceDownDatas] = await Promise.all([
-            bxPriceUpDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
-            bxPriceDownDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate)
+        let [omgBxPriceUpDatas, omgBxPriceDownDatas, evxBxPriceUpDatas, evxBxPriceDownDatas] = await Promise.all([
+            omgBxPriceUpDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
+            omgBxPriceDownDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
+            evxBxPriceUpDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
+            evxBxPriceDownDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate)
         ])
 
         return {
-            priceUp: bxPriceUpDatas,
-            priceDown: bxPriceDownDatas
+            omg: {
+                priceUp: omgBxPriceUpDatas,
+                priceDown: omgBxPriceDownDatas
+            },
+            evx: {
+                priceUp: evxBxPriceUpDatas,
+                priceDown: evxBxPriceDownDatas
+            }
         }
     }
 
@@ -45,7 +55,7 @@ class FirestoreService {
 
         for (let user of users) {
             let doc = this.firestore.collection('users').doc(user.id)
-            firestoreBatch.update(doc, { omg: { bx_price: currentPrice.omg } })
+            firestoreBatch.set(doc, { omg: { bx_price: currentPrice.omg }, evx: { bx_price: currentPrice.evx } }, { merge: true })
         }
 
         let response = await firestoreBatch.commit()
