@@ -12,5 +12,4 @@ const process = async () => {
     return result
 }
 
-// process()
 setInterval(process, 60 * 1000 * 5)
