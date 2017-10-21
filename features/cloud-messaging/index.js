@@ -29,6 +29,8 @@ class CloudMessagingService {
             }
         }
 
+        console.log(tokens)
+
         /* If there're no users should be notified then do nothing. */
         if (tokens.omg.priceUp.length + tokens.omg.priceDown.length + tokens.evx.priceUp.length + tokens.evx.priceDown.length == 0) return
 

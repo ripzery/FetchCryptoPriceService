@@ -50,7 +50,6 @@ class FirestoreService {
 
     async updateDocument(pushNotificationSuccess, users, currentPrice) {
         if (!pushNotificationSuccess) return
-        console.log(users)
         let firestoreBatch = this.firestore.batch()
 
         for (let user of users) {
