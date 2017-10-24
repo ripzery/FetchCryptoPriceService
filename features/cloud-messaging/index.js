@@ -42,7 +42,8 @@ class CloudMessagingService {
             this.payload.data.color = COLOR_GREEN
             let response = await this.messaging.sendToDevice(tokens.omg.priceUp, this.payload)
             this.logFCMResponse(response)
-            await FirestoreService.updateDocument(!response.failureCount, [...waitingNotifyUsers.omg.priceUp, ...waitingNotifyUsers.omg.priceDown, ...waitingNotifyUsers.evx.priceUp, ...waitingNotifyUsers.evx.priceDown], price)
+            waitingNotifyUsers.omg.priceUp = waitingNotifyUsers.omg.priceUp.map((user,index) => { return {...user, isSentSuccessfully: !response.results[index].error} })
+            await FirestoreService.updateDocument(response.successCount, waitingNotifyUsers.omg.priceUp, price)
         }
 
         /* If there's users should be know that omg price is going down, then send notification */
@@ -53,7 +54,8 @@ class CloudMessagingService {
             this.payload.data.color = COLOR_RED
             let response = await this.messaging.sendToDevice(tokens.omg.priceDown, this.payload)
             this.logFCMResponse(response)
-            await FirestoreService.updateDocument(!response.failureCount, [...waitingNotifyUsers.omg.priceUp, ...waitingNotifyUsers.omg.priceDown, ...waitingNotifyUsers.evx.priceUp, ...waitingNotifyUsers.evx.priceDown], price)
+            waitingNotifyUsers.omg.priceDown = waitingNotifyUsers.omg.priceDown.map((user,index) => { return {...user, isSentSuccessfully: !response.results[index].error} })
+            await FirestoreService.updateDocument(response.successCount, waitingNotifyUsers.omg.priceDown, price)
         }
 
         /* If there's users should be know that evx price is going up, then send notification */
@@ -64,7 +66,8 @@ class CloudMessagingService {
             this.payload.data.color = COLOR_GREEN
             let response = await this.messaging.sendToDevice(tokens.evx.priceUp, this.payload)
             this.logFCMResponse(response)
-            await FirestoreService.updateDocument(!response.failureCount, [...waitingNotifyUsers.omg.priceUp, ...waitingNotifyUsers.omg.priceDown, ...waitingNotifyUsers.evx.priceUp, ...waitingNotifyUsers.evx.priceDown], price)
+            waitingNotifyUsers.evx.priceUp = waitingNotifyUsers.evx.priceUp.map((user,index) => { return {...user, isSentSuccessfully: !response.results[index].error} })
+            await FirestoreService.updateDocument(response.successCount, waitingNotifyUsers.evx.priceUp, price)
         }
 
         /* If there's users should be know that evx price is going down, then send notification */
@@ -75,16 +78,23 @@ class CloudMessagingService {
             this.payload.data.color = COLOR_RED
             let response = await this.messaging.sendToDevice(tokens.evx.priceDown, this.payload)
             this.logFCMResponse(response)
-            await FirestoreService.updateDocument(!response.failureCount, [...waitingNotifyUsers.omg.priceUp, ...waitingNotifyUsers.omg.priceDown, ...waitingNotifyUsers.evx.priceUp, ...waitingNotifyUsers.evx.priceDown], price)
+            waitingNotifyUsers.evx.priceDownevx.priceDown = waitingNotifyUsers.evx.priceDown.map((user,index) => { return {...user, isSentSuccessfully: !response.results[index].error} })
+            await FirestoreService.updateDocument(response.successCount, waitingNotifyUsers.evx.priceDown, price)
         }
     }
 
     async logFCMResponse(response) {
         if (response.failureCount) {
-            let { code, message } = response.results[0].error.errorInfo
-            console.log("Error sending message \ncode:", code + "\nmessage:", message);
-        } else
-            console.log("Successfully sent message:", response);
+            console.log("Total failed count :", response.failureCount)
+            for (let result of response.results) {
+                if (result.error)
+                    console.log("Error code:", result.error.errorInfo.code);
+            }
+        }
+
+        if (response.successCount){
+            console.log("Total successfully sent message:", response.successCount);
+        }
     }
 }
 

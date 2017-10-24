@@ -53,12 +53,14 @@ class FirestoreService {
         let firestoreBatch = this.firestore.batch()
 
         for (let user of users) {
-            let doc = this.firestore.collection('users').doc(user.id)
-            firestoreBatch.set(doc, { omg: { bx_price: currentPrice.omg }, evx: { bx_price: currentPrice.evx } }, { merge: true })
+            if (user.isSentSuccessfully) {
+                let doc = this.firestore.collection('users').doc(user.id)
+                firestoreBatch.set(doc, { omg: { bx_price: currentPrice.omg }, evx: { bx_price: currentPrice.evx } }, { merge: true })
+            }
         }
 
         let response = await firestoreBatch.commit()
-        return console.log(`Successfully executed ${users.length} batch.`)
+        return console.log(`Successfully executed ${users.filter(v => v.isSentSuccessfully).length} batch.`)
     }
 }
 
