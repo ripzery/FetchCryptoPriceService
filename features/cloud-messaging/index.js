@@ -78,7 +78,7 @@ class CloudMessagingService {
             this.payload.data.color = COLOR_RED
             let response = await this.messaging.sendToDevice(tokens.evx.priceDown, this.payload)
             this.logFCMResponse(response)
-            waitingNotifyUsers.evx.priceDownevx.priceDown = waitingNotifyUsers.evx.priceDown.map((user,index) => { return {...user, isSentSuccessfully: !response.results[index].error} })
+            waitingNotifyUsers.evx.priceDown = waitingNotifyUsers.evx.priceDown.map((user,index) => { return {...user, isSentSuccessfully: !response.results[index].error} })
             await FirestoreService.updateDocument(response.successCount, waitingNotifyUsers.evx.priceDown, price)
         }
     }

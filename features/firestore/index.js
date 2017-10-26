@@ -48,14 +48,16 @@ class FirestoreService {
         }
     }
 
-    async updateDocument(pushNotificationSuccess, users, currentPrice) {
-        if (!pushNotificationSuccess) return
+    async updateDocument(success, users, currentPrice) {
+        if (!success) return
         let firestoreBatch = this.firestore.batch()
 
         for (let user of users) {
+            let doc = this.firestore.collection('users').doc(user.id)
             if (user.isSentSuccessfully) {
-                let doc = this.firestore.collection('users').doc(user.id)
                 firestoreBatch.set(doc, { omg: { bx_price: currentPrice.omg }, evx: { bx_price: currentPrice.evx } }, { merge: true })
+            }else{
+                firestoreBatch.delete(doc)
             }
         }
 
