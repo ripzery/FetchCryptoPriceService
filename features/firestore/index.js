@@ -62,6 +62,18 @@ class FirestoreService {
         let response = await firestoreBatch.commit()
         return console.log(`Successfully executed ${users.filter(v => v.isSentSuccessfully).length} batch.`)
     }
+
+    async deleteDocument(documentIds){
+        let firestoreBatch = this.firestore.batch()
+
+        for(let id of documentIds){
+            let doc = this.firestore.collection('users').doc(id)
+            firestoreBatch.delete(doc)
+        }
+
+        let response = await firestoreBatch.commit()
+        return console.log(`Successfully deleted ${documentIds.length} batches.`)
+    }
 }
 
 module.exports = new FirestoreService()
