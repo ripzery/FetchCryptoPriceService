@@ -38,52 +38,52 @@ class CloudMessagingService {
         if (tokens.omg.priceUp.length) {
             this.payload.data.type = "up"
             this.payload.data.currency = "omg"
-            this.payload.data.price = price.omg
+            this.payload.data.price = `${price.omg}`
             this.payload.data.body = `Hooray! OMG is going up more than 5%!. <current_price>, but the current price is now ${price.omg}`
             this.payload.data.color = COLOR_GREEN
             let response = await this.messaging.sendToDevice(tokens.omg.priceUp, this.payload)
             this.logFCMResponse(response)
-            waitingNotifyUsers.omg.priceUp = waitingNotifyUsers.omg.priceUp.map((user,index) => { return {...user, isSentSuccessfully: !response.results[index].error} })
-            await FirestoreService.updateDocument(response.successCount, waitingNotifyUsers.omg.priceUp, price)
+            waitingNotifyUsers.omg.priceUp = waitingNotifyUsers.omg.priceUp.map((user, index) => { return { ...user, isSentSuccessfully: !response.results[index].error } })
+            await FirestoreService.updateDocument(waitingNotifyUsers.omg.priceUp, price)
         }
 
         /* If there's users should be know that omg price is going down, then send notification */
         if (tokens.omg.priceDown.length) {
             this.payload.data.type = "down"
             this.payload.data.currency = "omg"
-            this.payload.data.price = price.omg
+            this.payload.data.price = `${price.omg}`
             this.payload.data.body = `Boo.. OMG is going down 5% check it out. <current_price>, but the current price is now ${price.omg}`
             this.payload.data.color = COLOR_RED
             let response = await this.messaging.sendToDevice(tokens.omg.priceDown, this.payload)
             this.logFCMResponse(response)
-            waitingNotifyUsers.omg.priceDown = waitingNotifyUsers.omg.priceDown.map((user,index) => { return {...user, isSentSuccessfully: !response.results[index].error} })
-            await FirestoreService.updateDocument(response.successCount, waitingNotifyUsers.omg.priceDown, price)
+            waitingNotifyUsers.omg.priceDown = waitingNotifyUsers.omg.priceDown.map((user, index) => { return { ...user, isSentSuccessfully: !response.results[index].error } })
+            await FirestoreService.updateDocument(waitingNotifyUsers.omg.priceDown, price)
         }
 
         /* If there's users should be know that evx price is going up, then send notification */
         if (tokens.evx.priceUp.length) {
             this.payload.data.type = "up"
             this.payload.data.currency = "evx"
-            this.payload.data.price = price.evx
+            this.payload.data.price = `${price.evx}`
             this.payload.data.body = `Hooray! EVX is going up more than 5%!. <current_price>, but the current price is now ${price.evx}`
             this.payload.data.color = COLOR_GREEN
             let response = await this.messaging.sendToDevice(tokens.evx.priceUp, this.payload)
             this.logFCMResponse(response)
-            waitingNotifyUsers.evx.priceUp = waitingNotifyUsers.evx.priceUp.map((user,index) => { return {...user, isSentSuccessfully: !response.results[index].error} })
-            await FirestoreService.updateDocument(response.successCount, waitingNotifyUsers.evx.priceUp, price)
+            waitingNotifyUsers.evx.priceUp = waitingNotifyUsers.evx.priceUp.map((user, index) => { return { ...user, isSentSuccessfully: !response.results[index].error } })
+            await FirestoreService.updateDocument(waitingNotifyUsers.evx.priceUp, price)
         }
 
         /* If there's users should be know that evx price is going down, then send notification */
         if (tokens.evx.priceDown.length) {
             this.payload.data.type = "down"
             this.payload.data.currency = "evx"
-            this.payload.data.price = price.evx
+            this.payload.data.price = `${price.evx}`
             this.payload.data.body = `Boo.. EVX is going down 5% check it out. <current_price>, but the current price is now ${price.evx}`
             this.payload.data.color = COLOR_RED
             let response = await this.messaging.sendToDevice(tokens.evx.priceDown, this.payload)
             this.logFCMResponse(response)
-            waitingNotifyUsers.evx.priceDown = waitingNotifyUsers.evx.priceDown.map((user,index) => { return {...user, isSentSuccessfully: !response.results[index].error} })
-            await FirestoreService.updateDocument(response.successCount, waitingNotifyUsers.evx.priceDown, price)
+            waitingNotifyUsers.evx.priceDown = waitingNotifyUsers.evx.priceDown.map((user, index) => { return { ...user, isSentSuccessfully: !response.results[index].error } })
+            await FirestoreService.updateDocument(waitingNotifyUsers.evx.priceDown, price)
         }
     }
 
@@ -96,7 +96,7 @@ class CloudMessagingService {
             }
         }
 
-        if (response.successCount){
+        if (response.successCount) {
             console.log("Total successfully sent message:", response.successCount);
         }
     }

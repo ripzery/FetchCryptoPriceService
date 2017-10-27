@@ -48,8 +48,7 @@ class FirestoreService {
         }
     }
 
-    async updateDocument(success, users, currentPrice) {
-        if (!success) return
+    async updateDocument(users, currentPrice) {
         let firestoreBatch = this.firestore.batch()
 
         for (let user of users) {
@@ -62,7 +61,8 @@ class FirestoreService {
         }
 
         let response = await firestoreBatch.commit()
-        return console.log(`Successfully executed ${users.filter(v => v.isSentSuccessfully).length} batch.`)
+        console.log(`Successfully deleted ${users.filter(v => !v.isSentSuccessfully).length} batch.`)
+        return console.log(`Successfully updated ${users.filter(v => v.isSentSuccessfully).length} batch.`)
     }
 
     async deleteDocument(documentIds){
