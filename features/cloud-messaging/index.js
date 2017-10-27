@@ -38,6 +38,7 @@ class CloudMessagingService {
         if (tokens.omg.priceUp.length) {
             this.payload.data.type = "up"
             this.payload.data.currency = "omg"
+            this.payload.data.price = price.omg
             this.payload.data.body = `Hooray! OMG is going up more than 5%!. <current_price>, but the current price is now ${price.omg}`
             this.payload.data.color = COLOR_GREEN
             let response = await this.messaging.sendToDevice(tokens.omg.priceUp, this.payload)
@@ -50,6 +51,7 @@ class CloudMessagingService {
         if (tokens.omg.priceDown.length) {
             this.payload.data.type = "down"
             this.payload.data.currency = "omg"
+            this.payload.data.price = price.omg
             this.payload.data.body = `Boo.. OMG is going down 5% check it out. <current_price>, but the current price is now ${price.omg}`
             this.payload.data.color = COLOR_RED
             let response = await this.messaging.sendToDevice(tokens.omg.priceDown, this.payload)
@@ -62,6 +64,7 @@ class CloudMessagingService {
         if (tokens.evx.priceUp.length) {
             this.payload.data.type = "up"
             this.payload.data.currency = "evx"
+            this.payload.data.price = price.evx
             this.payload.data.body = `Hooray! EVX is going up more than 5%!. <current_price>, but the current price is now ${price.evx}`
             this.payload.data.color = COLOR_GREEN
             let response = await this.messaging.sendToDevice(tokens.evx.priceUp, this.payload)
@@ -74,6 +77,7 @@ class CloudMessagingService {
         if (tokens.evx.priceDown.length) {
             this.payload.data.type = "down"
             this.payload.data.currency = "evx"
+            this.payload.data.price = price.evx
             this.payload.data.body = `Boo.. EVX is going down 5% check it out. <current_price>, but the current price is now ${price.evx}`
             this.payload.data.color = COLOR_RED
             let response = await this.messaging.sendToDevice(tokens.evx.priceDown, this.payload)
