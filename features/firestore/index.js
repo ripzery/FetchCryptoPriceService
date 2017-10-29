@@ -22,6 +22,7 @@ class FirestoreService {
             this.firestore.collection('users').where('evx.bx_price', ">=", basePrice.evx / (1 - deviation)).get()
         ])
 
+
         /* Get document snapshot for each user */
         let [omgBxPriceUpDocumentsSnapshot, omgBxPriceDownDocumentsSnapshot, evxBxPriceUpDocumentsSnapshot, evxBxPriceDownDocumentsSnapshot] = await Promise.all([omgBxPriceUpQuerySnapshot.docs, omgBxPriceDownQuerySnapshot.docs, evxBxPriceUpQuerySnapshot.docs, evxBxPriceDownQuerySnapshot.docs])
 
@@ -54,7 +55,7 @@ class FirestoreService {
         for (let user of users) {
             let doc = this.firestore.collection('users').doc(user.id)
             if (user.isSentSuccessfully) {
-                firestoreBatch.set(doc, { omg: { bx_price: currentPrice.omg }, evx: { bx_price: currentPrice.evx } }, { merge: true })
+                firestoreBatch.set(doc, currentPrice, { merge: true })
             }else{
                 firestoreBatch.delete(doc)
             }

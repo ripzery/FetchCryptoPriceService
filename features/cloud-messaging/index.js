@@ -44,7 +44,7 @@ class CloudMessagingService {
             let response = await this.messaging.sendToDevice(tokens.omg.priceUp, this.payload)
             this.logFCMResponse(response)
             waitingNotifyUsers.omg.priceUp = waitingNotifyUsers.omg.priceUp.map((user, index) => { return { ...user, isSentSuccessfully: !response.results[index].error } })
-            await FirestoreService.updateDocument(waitingNotifyUsers.omg.priceUp, price)
+            await FirestoreService.updateDocument(waitingNotifyUsers.omg.priceUp, {omg: {bx_price: price.omg}})
         }
 
         /* If there's users should be know that omg price is going down, then send notification */
@@ -57,7 +57,7 @@ class CloudMessagingService {
             let response = await this.messaging.sendToDevice(tokens.omg.priceDown, this.payload)
             this.logFCMResponse(response)
             waitingNotifyUsers.omg.priceDown = waitingNotifyUsers.omg.priceDown.map((user, index) => { return { ...user, isSentSuccessfully: !response.results[index].error } })
-            await FirestoreService.updateDocument(waitingNotifyUsers.omg.priceDown, price)
+            await FirestoreService.updateDocument(waitingNotifyUsers.omg.priceDown, {omg: {bx_price: price.omg}})
         }
 
         /* If there's users should be know that evx price is going up, then send notification */
@@ -70,7 +70,7 @@ class CloudMessagingService {
             let response = await this.messaging.sendToDevice(tokens.evx.priceUp, this.payload)
             this.logFCMResponse(response)
             waitingNotifyUsers.evx.priceUp = waitingNotifyUsers.evx.priceUp.map((user, index) => { return { ...user, isSentSuccessfully: !response.results[index].error } })
-            await FirestoreService.updateDocument(waitingNotifyUsers.evx.priceUp, price)
+            await FirestoreService.updateDocument(waitingNotifyUsers.evx.priceUp, {evx: {bx_price: price.evx}})
         }
 
         /* If there's users should be know that evx price is going down, then send notification */
@@ -83,7 +83,7 @@ class CloudMessagingService {
             let response = await this.messaging.sendToDevice(tokens.evx.priceDown, this.payload)
             this.logFCMResponse(response)
             waitingNotifyUsers.evx.priceDown = waitingNotifyUsers.evx.priceDown.map((user, index) => { return { ...user, isSentSuccessfully: !response.results[index].error } })
-            await FirestoreService.updateDocument(waitingNotifyUsers.evx.priceDown, price)
+            await FirestoreService.updateDocument(waitingNotifyUsers.evx.priceDown, {evx: {bx_price: price.evx}})
         }
     }
 
