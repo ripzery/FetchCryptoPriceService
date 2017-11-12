@@ -15,26 +15,70 @@ class FirestoreService {
     */
     async fetchNeededNotifyUsers(basePrice, deviation) {
         /* Query bx price that have deviation more than or equal 5% */
-        let [omgBxPriceUpQuerySnapshot, omgBxPriceDownQuerySnapshot, evxBxPriceUpQuerySnapshot, evxBxPriceDownQuerySnapshot] = await Promise.all([
+        let querySnapshots = await Promise.all([
             this.firestore.collection('users').where('omg.bx_price', "<=", basePrice.omg / (1 + deviation)).get(),
             this.firestore.collection('users').where('omg.bx_price', ">=", basePrice.omg / (1 - deviation)).get(),
             this.firestore.collection('users').where('evx.bx_price', "<=", basePrice.evx / (1 + deviation)).get(),
-            this.firestore.collection('users').where('evx.bx_price', ">=", basePrice.evx / (1 - deviation)).get()
+            this.firestore.collection('users').where('evx.bx_price', ">=", basePrice.evx / (1 - deviation)).get(),
+
+            this.firestore.collection('users').where('btc.bx_price', "<=", basePrice.btc / (1 + deviation)).get(),
+            this.firestore.collection('users').where('btc.bx_price', ">=", basePrice.btc / (1 - deviation)).get(),
+            this.firestore.collection('users').where('eth.bx_price', "<=", basePrice.eth / (1 + deviation)).get(),
+            this.firestore.collection('users').where('eth.bx_price', ">=", basePrice.eth / (1 - deviation)).get()
         ])
+
+        let omgBxPriceUpQuerySnapshot = querySnapshots[0]
+        let omgBxPriceDownQuerySnapshot = querySnapshots[1]
+        let evxBxPriceUpQuerySnapshot = querySnapshots[2]
+        let evxBxPriceDownQuerySnapshot = querySnapshots[3]
+        let btcBxPriceUpQuerySnapshot = querySnapshots[4]
+        let btcBxPriceDownQuerySnapshot = querySnapshots[5]
+        let ethBxPriceUpQuerySnapshot = querySnapshots[6]
+        let ethBxPriceDownQuerySnapshot = querySnapshots[7]
 
 
         /* Get document snapshot for each user */
-        let [omgBxPriceUpDocumentsSnapshot, omgBxPriceDownDocumentsSnapshot, evxBxPriceUpDocumentsSnapshot, evxBxPriceDownDocumentsSnapshot] = await Promise.all([omgBxPriceUpQuerySnapshot.docs, omgBxPriceDownQuerySnapshot.docs, evxBxPriceUpQuerySnapshot.docs, evxBxPriceDownQuerySnapshot.docs])
+        let documentSnapshots = await Promise.all([
+            omgBxPriceUpQuerySnapshot.docs, 
+            omgBxPriceDownQuerySnapshot.docs, 
+            evxBxPriceUpQuerySnapshot.docs, 
+            evxBxPriceDownQuerySnapshot.docs,
+            btcBxPriceUpQuerySnapshot.docs, 
+            btcBxPriceDownQuerySnapshot.docs, 
+            ethBxPriceUpQuerySnapshot.docs, 
+            ethBxPriceDownQuerySnapshot.docs
+        ])
+        
+        let omgBxPriceUpDocumentsSnapshot = documentSnapshots[0]
+        let omgBxPriceDownDocumentsSnapshot = documentSnapshots[1]
+        let evxBxPriceUpDocumentsSnapshot = documentSnapshots[2]
+        let evxBxPriceDownDocumentsSnapshot = documentSnapshots[3]
+        let btcBxPriceUpDocumentsSnapshot = documentSnapshots[4]
+        let btcBxPriceDownDocumentsSnapshot = documentSnapshots[5]
+        let ethBxPriceUpDocumentsSnapshot = documentSnapshots[6]
+        let ethBxPriceDownDocumentsSnapshot = documentSnapshots[7]
 
         /* Get deviceTokens of the users that needed notify */
         let filteredPredicate = (document) => document.data().refreshedToken
         let mappedPredicate = (document) => { return { ...document.data(), id: document.id } }
 
-        let [omgBxPriceUpDatas, omgBxPriceDownDatas, evxBxPriceUpDatas, evxBxPriceDownDatas] = await Promise.all([
+        let [
+            omgBxPriceUpDatas, 
+            omgBxPriceDownDatas, 
+            evxBxPriceUpDatas, 
+            evxBxPriceDownDatas,
+            btcBxPriceUpDatas, 
+            btcBxPriceDownDatas, 
+            ethBxPriceUpDatas, 
+            ethBxPriceDownDatas] = await Promise.all([
             omgBxPriceUpDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
             omgBxPriceDownDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
             evxBxPriceUpDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
-            evxBxPriceDownDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate)
+            evxBxPriceDownDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
+            btcBxPriceUpDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
+            btcBxPriceDownDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
+            ethBxPriceUpDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate),
+            ethBxPriceDownDocumentsSnapshot.filter(filteredPredicate).map(mappedPredicate)
         ])
 
         return {
@@ -45,6 +89,14 @@ class FirestoreService {
             evx: {
                 priceUp: evxBxPriceUpDatas,
                 priceDown: evxBxPriceDownDatas
+            },
+            btc: {
+                priceUp: btcBxPriceUpDatas,
+                priceDown: btcBxPriceDownDatas
+            },
+            eth: {
+                priceUp: ethBxPriceUpDatas,
+                priceDown: ethBxPriceDownDatas
             }
         }
     }
