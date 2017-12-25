@@ -1,39 +1,42 @@
 class MarketService {
     constructor() {
         this.ENDPOINT_BX = 'https://bx.in.th/api/'
-        this.ENDPOINT_COIN_MARKET_CAP = 'https://api.coinmarketcap.com/v1/ticker/'
-        this.BX_KEY_OMG = '26'
-        this.BX_KEY_EVX = '28'
-        this.BX_KEY_BTC = '1'
-        this.BX_KEY_ETH = '21'
-        this.CMC_KEY_OMG = 'omisego'
-        this.CMC_KEY_EVX = 'everex' // it doesn't has
-        this.CMC_KEY_BTC = 'bitcoin'
-        this.CMC_KEY_ETH = 'ethereum'
+        this.ENDPOINT_COIN_MARKET_CAP = 'https://api.coinmarketcap.com/v1/ticker/?limit=0'
     }
+
+    async fetch() {
+        let bxPrice = await this.fetchBx();
+        let cmcPrice = await this.fetchCoinmarketCap(bxPrice)
+
+        return [bxPrice, cmcPrice]
+    }
+
 
     /* Fetch Bx.in.th price */
     async fetchBx() {
         let response = await fetch(this.ENDPOINT_BX)
         let bx = await response.json()
-        return {
-            omg: bx[this.BX_KEY_OMG].last_price,
-            evx: bx[this.BX_KEY_EVX].last_price,
-            btc: bx[this.BX_KEY_BTC].last_price,
-            eth: bx[this.BX_KEY_ETH].last_price
-        }
+        bx = Object.keys(bx).map(k => bx[k]).filter(v => v['primary_currency'] == 'THB')
+        let result = bx.reduce((acc, v) => {
+            acc[v['secondary_currency'].toLowerCase()] = v['last_price']
+            return acc
+        }, {})
+
+        // console.log(result)
+
+        return result
     }
 
     /* Fetch coinmarketcap.com price */
-    async fetchCoinmarketCap() {
+    async fetchCoinmarketCap(bxPrice) {
         let response = await fetch(this.ENDPOINT_COIN_MARKET_CAP)
         let cmc = await response.json()
-        let [btc, eth, omg] = await cmc.filter(v => v.id == this.CMC_KEY_OMG || v.id == this.CMC_KEY_BTC || v.id == this.CMC_KEY_ETH).map(v => v.price_usd)
-        return {
-            btc,
-            eth,
-            omg
-        }
+        let cmcList = await cmc.filter(v => v.id != 'das' && bxPrice[v.symbol.toLowerCase()] || v.id == 'dash')
+        let result = cmcList.reduce((acc, v) => {
+            acc[v['symbol'].substring(0,3).toLowerCase()] = v['price_usd']
+            return acc
+        }, {})
+        return result
     }
 }
 
