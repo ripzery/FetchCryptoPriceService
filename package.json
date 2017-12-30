@@ -1,6 +1,6 @@
 {
   "name": "FetchCryptoPriceService",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "repository": "https://github.com/ripzery/FetchCryptoPriceService.git",
   "author": "Phuchit Sirimongkolsathien <phuchit.sir@ascendcorp.com>",
